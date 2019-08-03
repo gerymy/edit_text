@@ -7,17 +7,22 @@
 #include<unistd.h>
 int main()
 {
+	int i;
 	int file_descriptor;
-	char text[]="Hello, it's me";
-	char buff[20]={0};
-	file_descriptor=creat("test.txt",0666);
-	write(file_descriptor,text,14);
-	read(file_descriptor,&buff,14);
+	char text[]="Hello, world!";
+	char chtenie;
+	file_descriptor=creat("test.txt",0666);//создаём или обнуляем файл
+	write(file_descriptor,text,strlen(text));//записываем строку текст
 	close(file_descriptor);
-	printf("hello %s \n", buff);
-	file_descriptor=open("test.txt",O_RDONLY);
-	read(file_descriptor, &buff, 20);
-	printf("2: %s \n",buff);
+	file_descriptor=open("test.txt",O_RDONLY);//открываем файл для чтения
+	off_t k=lseek(file_descriptor,0,SEEK_END);//определяем длину файла
+	for(i=0;i<=k-1;i++)//цикл чтения файла и записи наоборот
+		{
+		lseek(file_descriptor,-1-i,SEEK_END);
+		read(file_descriptor, &chtenie,1);
+		printf(" %c ", chtenie);
+		}
 	close(file_descriptor);
+	printf("\n");
 	return 0;
 }
