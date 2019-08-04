@@ -16,23 +16,27 @@ int main(int argc, char ** argv)
 {
 	WINDOW * wnd;
 	WINDOW * subwnd;
-	char password[MAX_LEN + 1];
+	FILE *fd;
+	fd=fopen("txt.txt","r");
 	int x, y;
+	int n,l,i, test;
+	int line=0;
 	char f;
 	int ch;
+	int buf;
 	initscr();
 	signal (SIGWINCH, sig_winch);
-	curs_set(1);
 	delwin(wnd);
 	curs_set(1);
-	//move(8,4);
-	//wmove(stdscr,9, 0);
 	attroff(A_BOLD);//format texta
-	//attron(A_BLINK);
 	keypad(stdscr, TRUE);
-	//getyx(stdscr, y, x);
-	//mvwaddch(win, y, x-1, '_');
-	while ((ch = wgetch(stdscr)) != KEY_BACKSPACE) {
+	while ((buf = getc(fd)) != EOF) {
+            if (buf == '\n') line++;
+            if (line > LINES - 2) break;
+            addch(buf);
+          }
+    fclose (fd);
+	while ((ch = wgetch(stdscr)) != CTRL('D')) {
 		if(ch == KEY_UP)	
 		{
 		getyx(stdscr, y, x);
@@ -65,27 +69,27 @@ int main(int argc, char ** argv)
 		refresh();
 		continue;
 		}
-		//if (ch == KEY_BACKSPACE)
-		  //  {
-		//	if (i==0) continue;
-		//	getyx(win, y, x);
-		//	mvwaddch(win, y, x-1, ' ');
-		//	wrefresh(win);
-		//	wmove(win, y, x-1);
-		//	i--;
-		//	continue;
 		}
-		getyx(stdscr, y, x);
-	//wscanw(stdscr,y,x,"%c", &f);
-	//move(10, 10);
-	//attroff(A_BLINK);
-	//printw("hop hay:%c", f);
-	printw("Press any key to continue...");
-	//move(10, 4);
-	//attroff(A_BLINK);
-	//printw("hop hay");
+	getyx(stdscr, y, x);
+fd = fopen ("txt.txt", "w");
+          for ( l = 0; l < LINES - 1; l++) {
+            //n = COLS;
+            for ( i = 0; i < COLS; i++)
+            {
+            	
+            	if(mvinch(l,i)== '@') 
+            		{
+            			refresh();
+						endwin();
+						exit(EXIT_SUCCESS);
+            		}
+            	putc (mvinch (l, i) & A_CHARTEXT, fd);
+            }
+            	test=mvinch(l,i);
+            putc('\n', fd);
+          }
+          fclose(fd);
 	refresh();
-	getch();
 	endwin();
 	exit(EXIT_SUCCESS);
 }
