@@ -11,21 +11,22 @@ void sig_winch(int signo)
 	ioctl(fileno(stdout),TIOCGWINSZ, (char *) &size);
 	resizeterm(size.ws_row, size.ws_col);
 }
-void vvod()
+void vvod(char *path)
 {
 	FILE *fd;
 	int buf;
-	fd=fopen("txt.txt","r");
+	//fd=fopen("./txt.txt","r");
+	fd=fopen(path,"r");
 	while ((buf = getc(fd)) != EOF) 
 	{
     	addch(buf);
     }
     fclose (fd);
 }
-void edit()
+void edit(char *path)
 {
 	int ch;
-	while ((ch = wgetch(stdscr)) != CTRL('D')) {
+	while ((ch = wgetch(stdscr)) != KEY_F(9)) {
 		if(ch == KEY_UP)	
 		{
 		getyx(stdscr, y, x);
@@ -58,13 +59,22 @@ void edit()
 		refresh();
 		continue;
 		}
+		if(ch == KEY_F(8))
+		{
+			save(path);
+		}
 		}
 }
-void write1()
+void exit6()
+{
+	endwin();
+	exit(EXIT_SUCCESS);
+}
+void save(char *path)
 {	
 	int lines,columns;
 	FILE *fd;
-	fd = fopen ("txt.txt", "w");
+	fd = fopen (path, "w");
           for ( lines = 0; lines < LINES - 1; lines++) {
             for ( columns = 0; columns < COLS; columns++)
             {
@@ -86,19 +96,45 @@ int main(int argc, char ** argv)
 	//WINDOW * subwnd;
 	FILE *fd;
 	//int line=0;
-	//int ch;
+	int func;
 	//int buf;
+	//argv[1];
 	initscr();
 	signal (SIGWINCH, sig_winch);
 	//delwin(wnd);
 	curs_set(1);
-	attroff(A_BOLD);//format texta
+	attron(A_BOLD);//format texta
 	keypad(stdscr, TRUE);
-	vvod();
-	edit();
-	getyx(stdscr, y, x);
-	write1();
-	refresh();
+	//move(LINES-3, 1);
+	//printw("Wellcome to best text editor in the world , F6-open file, F7-close, F8-save\n");
+	move(0,0);
+	for (;;)
+	{	
+		func = wgetch(stdscr);
+		getyx(stdscr,y,x);
+		if(func == KEY_F(6))
+		{
+			vvod(argv[1]);
+		}
+		if(func == KEY_F(7))
+		{
+			edit(argv[1]);
+		}
+		if(func == KEY_F(8))
+		{
+			save(argv[1]);
+		}
+		if(func == KEY_F(9))
+		{
+			exit6();
+		}
+		refresh();
+	}
+	//vvod();
+	//edit();
+	//getyx(stdscr, y, x);
+	//write1();
+	//refresh();
 	endwin();
 	exit(EXIT_SUCCESS);
 }
